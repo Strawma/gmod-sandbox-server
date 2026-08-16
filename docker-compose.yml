@@ -2,9 +2,8 @@ services:
   gmod-sandbox:
     container_name: gmod-sandbox
     hostname: gmod-sandbox
-    build:
-      context: .
-    image: gmod-server:local
+    image: ghcr.io/strawma/gmod-sandbox-server:latest
+    pull_policy: always
     environment:
       PRESET: sandbox
       GAMEMODE: sandbox
@@ -23,7 +22,6 @@ services:
       - "27015:27015/udp"
     volumes:
       - /home/ramis/docker/gmod:/data
-      - ./presets:/presets:ro
     cap_drop:
       - ALL
     security_opt:

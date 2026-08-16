@@ -18,6 +18,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=steam:steam entrypoint.sh /usr/local/bin/gmod-entrypoint
+COPY --chown=steam:steam presets /presets
 RUN chmod 0755 /usr/local/bin/gmod-entrypoint
 
 ENV HOME=/home/steam

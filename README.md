@@ -35,13 +35,30 @@ these environment values through Cosmos:
 - `SERVER_PASSWORD`: a join password, strongly recommended before exposing the
   server to the internet
 
-Build and start `gmod-sandbox`. The first launch downloads several gigabytes
-and can take a while. Later launches check for updates but reuse the persistent
-installation. Set `VALIDATE_ON_START=true` temporarily if an interrupted update
-or damaged installation needs a full verification.
+Start `gmod-sandbox`. The first launch downloads several gigabytes and can take
+a while. Later launches check for updates but reuse the persistent installation.
+Set `VALIDATE_ON_START=true` temporarily if an interrupted update or damaged
+installation needs a full verification.
 
-Deploy from a checkout of this project so Cosmos can access the Docker build
-context and the read-only `presets` bind mount.
+## Published image and automatic updates
+
+GitHub Actions publishes `ghcr.io/strawma/gmod-sandbox-server:latest` whenever
+container code or presets change on `main`. It also rebuilds at 05:15 UTC every
+Sunday to pick up changes from the rolling SteamCMD base and Ubuntu packages.
+Every image also receives an immutable `sha-<commit>` tag for rollback.
+
+The workflow publishes with GitHub's repository-scoped token, so no registry
+write credential needs to be added as a repository secret. A package associated
+with a private repository is private by default. Configure a GitHub personal
+access token (classic) with only `read:packages` in Cosmos's registry
+credentials, using the GitHub username as the registry username. If the package
+is deliberately made public later, Cosmos can pull it anonymously.
+
+Enable automatic updates for the container in Cosmos after the first successful
+deployment. An image update recreates the container and interrupts an active
+game session, while `/home/ramis/docker/gmod` remains untouched. The Compose
+`pull_policy: always` also fetches the current image whenever the service is
+recreated manually.
 
 The container publishes UDP port 27015. LAN players can connect to
 `192.168.50.49:27015`. Internet players need UDP 27015 forwarded by the router
@@ -54,7 +71,8 @@ published, so RCON is not reachable from outside the container.
 Vanilla Sandbox leaves `WORKSHOP_COLLECTION_ID` empty. For a modded mode:
 
 1. Add a public or unlisted Steam Workshop collection.
-2. Add `presets/<name>.cfg` for mode-specific server settings.
+2. Add `presets/<name>.cfg` for mode-specific server settings and allow the
+   publishing workflow to build the updated image.
 3. Copy the service and give it a unique service and container name.
 4. Change `PRESET`, `GAMEMODE`, `START_MAP`, `SERVER_NAME`, and
    `WORKSHOP_COLLECTION_ID`.

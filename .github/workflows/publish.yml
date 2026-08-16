@@ -1,0 +1,68 @@
+name: Build and publish container
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfile
+      - entrypoint.sh
+      - presets/**
+      - tests/**
+      - .dockerignore
+      - .github/workflows/publish.yml
+  schedule:
+    # Refresh the SteamCMD base and Ubuntu packages during a quiet weekly slot.
+    - cron: "15 5 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: publish-container
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Build test image
+        run: docker build --pull --tag gmod-server:test .
+
+      - name: Test entrypoint
+        env:
+          GMOD_IMAGE: gmod-server:test
+        run: ./tests/test-entrypoint.sh
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate image metadata
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=long
+
+      - name: Build and publish image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
