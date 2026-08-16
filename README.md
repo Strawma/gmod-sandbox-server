@@ -40,6 +40,13 @@ a while. Later launches check for updates but reuse the persistent installation.
 Set `VALIDATE_ON_START=true` temporarily if an interrupted update or damaged
 installation needs a full verification.
 
+The server defaults to GMod's `x86-64` branch, which contains Chromium and the
+64-bit binaries. Set `STEAM_BRANCH=public` to use the stable public branch, or
+set it to another Steam beta name when testing an upstream prerelease. The
+branch is passed explicitly on every update because SteamCMD remembers beta
+participation in the persistent installation. Changing `STEAM_BRANCH` switches
+the existing installation the next time the container starts.
+
 ## Published image and automatic updates
 
 GitHub Actions publishes `ghcr.io/strawma/gmod-sandbox-server:latest` whenever

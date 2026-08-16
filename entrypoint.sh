@@ -36,7 +36,7 @@ require_boolean() {
 
 update_server() {
   local attempt
-  local -a update_args=(+app_update "$app_id")
+  local -a update_args=(+app_update "$app_id" -beta "$STEAM_BRANCH")
 
   if [[ $VALIDATE_ON_START == true ]]; then
     update_args+=(validate)
@@ -71,6 +71,9 @@ SERVER_NAME=${SERVER_NAME:-Ramis GMod Sandbox}
 SERVER_PASSWORD=${SERVER_PASSWORD:-}
 GSLT=${GSLT:-}
 WORKSHOP_COLLECTION_ID=${WORKSHOP_COLLECTION_ID:-}
+# SteamCMD remembers beta participation in the persistent app manifest. Always
+# select a branch explicitly so changing this value also switches old installs.
+STEAM_BRANCH=${STEAM_BRANCH:-x86-64}
 UPDATE_ON_START=${UPDATE_ON_START:-true}
 VALIDATE_ON_START=${VALIDATE_ON_START:-false}
 
@@ -79,6 +82,7 @@ require_name GAMEMODE "$GAMEMODE"
 require_name START_MAP "$START_MAP"
 require_integer MAX_PLAYERS "$MAX_PLAYERS" 1 128
 require_integer SERVER_PORT "$SERVER_PORT" 1024 65535
+require_name STEAM_BRANCH "$STEAM_BRANCH"
 require_boolean UPDATE_ON_START "$UPDATE_ON_START"
 require_boolean VALIDATE_ON_START "$VALIDATE_ON_START"
 [[ -n $GSLT ]] || fail "GSLT is required; create one for Garry's Mod app ID 4000"

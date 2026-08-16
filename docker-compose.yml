@@ -11,6 +11,8 @@ services:
       MAX_PLAYERS: "16"
       SERVER_PORT: "27015"
       SERVER_NAME: Ramis GMod Sandbox
+      # Facepunch names the Chromium + 64-bit-binaries branch `x86-64`.
+      STEAM_BRANCH: x86-64
       # Create this for Garry's Mod app ID 4000, not dedicated-server app 4020.
       GSLT: ""
       # Set a password before forwarding the server through the router.

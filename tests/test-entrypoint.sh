@@ -35,6 +35,15 @@ invalid_collection_output=$(docker run --rm \
 [[ $invalid_collection_output == 'ERROR: WORKSHOP_COLLECTION_ID must be numeric when set' ]] \
   || fail 'invalid Workshop collection was not rejected'
 
+branch_output=$(docker run --rm \
+  -e GSLT=TESTTOKEN \
+  -e STEAM_BRANCH=prerelease \
+  -v "$project_dir/tests/fake-steamcmd:/usr/local/bin/steamcmd:ro" \
+  -v "$test_dir:/data" \
+  "$image")
+[[ $branch_output == *$'[+app_update]\n[4020]\n[-beta]\n[prerelease]'* ]] \
+  || fail 'configured Steam branch was not passed to SteamCMD'
+
 launch_output=$(docker run --rm \
   -e GSLT=TESTTOKEN \
   -e UPDATE_ON_START=false \
