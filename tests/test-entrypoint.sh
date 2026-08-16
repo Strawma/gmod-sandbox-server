@@ -13,6 +13,13 @@ fail() {
 
 mkdir -p "$test_dir/server/garrysmod/cfg"
 install -m 0755 "$project_dir/tests/fake-srcds-run" "$test_dir/server/srcds_run"
+# GitHub-hosted runners use a different UID than the image. These disposable
+# fixtures must remain writable so the test exercises the image's fixed UID.
+chmod 0777 \
+  "$test_dir" \
+  "$test_dir/server" \
+  "$test_dir/server/garrysmod" \
+  "$test_dir/server/garrysmod/cfg"
 
 missing_token_output=$(docker run --rm \
   -v "$test_dir:/data" \
