@@ -1,0 +1,31 @@
+services:
+  gmod-sandbox:
+    container_name: gmod-sandbox
+    hostname: gmod-sandbox
+    build:
+      context: .
+    image: gmod-server:local
+    environment:
+      PRESET: sandbox
+      GAMEMODE: sandbox
+      START_MAP: gm_construct
+      MAX_PLAYERS: "16"
+      SERVER_PORT: "27015"
+      SERVER_NAME: Ramis GMod Sandbox
+      # Create this for Garry's Mod app ID 4000, not dedicated-server app 4020.
+      GSLT: ""
+      # Set a password before forwarding the server through the router.
+      SERVER_PASSWORD: ""
+      WORKSHOP_COLLECTION_ID: ""
+      UPDATE_ON_START: "true"
+      VALIDATE_ON_START: "false"
+    ports:
+      - "27015:27015/udp"
+    volumes:
+      - /home/ramis/docker/gmod:/data
+      - ./presets:/presets:ro
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
